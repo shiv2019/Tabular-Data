@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fetch & Graph CSV</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="800" height="400"></canvas>
+    <script>
+        
+
+            charIt();
+           
+             
+            async function charIt() {
+            const data =  await  getData();
+            const ctx = document.getElementById('myChart').getContext('2d');
+           
+            const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.x,
+                datasets: [{
+                    label: 'Combined Land-Surface Air and Sea-Surface Water Temperature in C°',  // to type degree symbol hold alt + 248 :) ;)
+                    fill: false,
+                    data: data.y,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+           scales: {
+            yAxes: [{
+                ticks: {
+                    // Include a '°' symbol sign in the ticks
+                    callback: function(value, index, values) {
+                        return  value + '°';
+                    }
+                }
+            }]
+        }
+    }
+            
+        });
+    }  // End of chartIt Function()
+            
+
+            //Data From Zonal annual means, 1880-present, updated through most recent complete yea
+            // Website :- https://data.giss.nasa.gov/gistemp/
+            //File Format CSV (comma separated Values)
+            async function getData() {
+                const x =[];
+                const y = [];
+            const response = await fetch('ZonAnn.Ts+dSST.csv');
+            const data = await response.text();
+            console.log(data);
+
+            const table = data.split('\n').slice(1); // slice deletes the 0th index and gives copy of index 1 to rest data.
+            table.forEach(row => {
+                const columns = row.split(',')
+                const year = columns[0]; 
+                x.push(year);
+                const temp = columns[1];
+                y.push(parseFloat(temp) + 14);
+                console.log(year, temp);  
+            })
+                return { x, y };
+            
+            };
+
+        // Global-mean monthly, seasonal, and annual means, 1880-present, updated through most recent month:
+        // Website :- https://data.giss.nasa.gov/gistemp/
+        //File Format CSV (comma separated Values)
+
+        
+        // getGlobal();
+
+        //  async function getGlobal() {
+        //    const res = await fetch('GLB.Ts+dSST.csv');
+        //    const data = await res.text()
+        //    console.log(data);
+
+
+        //    const table = data.split('\n').slice(1);
+        //    table.forEach(row => {
+        //     const columns = row.split(',');
+        //     const year = columns[0];
+        //     const month = columns[1];
+        //     console.log(year, month);
+        //    })
+           
+        //  }
+
+    </script>
+
+</body>
+</html>
